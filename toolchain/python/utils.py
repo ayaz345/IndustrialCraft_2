@@ -54,13 +54,12 @@ def get_all_files(directory, extensions=()):
 def relative_path(directory, file):
 	directory = os.path.abspath(directory)
 	file = os.path.abspath(file)
-	if len(file) >= len(directory) and file[:len(directory)] == directory:
-		file = file[len(directory):]
-		while len(file) > 0 and file[0] in ("\\", "/"):
-			file = file[1:]
-		if len(file) == 0:
-			raise RuntimeError("file and directory are the same")
-		return file
-	else:
-		raise RuntimeError("file is not in a directory: file=" + file + " dir=" + directory)
+	if len(file) < len(directory) or file[: len(directory)] != directory:
+		raise RuntimeError(f"file is not in a directory: file={file} dir={directory}")
+	file = file[len(directory):]
+	while len(file) > 0 and file[0] in ("\\", "/"):
+		file = file[1:]
+	if len(file) == 0:
+		raise RuntimeError("file and directory are the same")
+	return file
 

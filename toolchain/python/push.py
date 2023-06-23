@@ -19,17 +19,16 @@ def get_push_pack_directory():
 		ans = input(f"push directory {directory} looks suspicious, it does not belong to horizon packs directory, push will corrupt all contents, allow it only if you know what are you doing (type Y or yes to proceed): ")
 		if ans.lower() in ["yes", "y"]:
 			return directory
-		else:
-			print("interpreted as NO, aborting push")
-			return None
+		print("interpreted as NO, aborting push")
+		return None
 	return directory
 
 
 def push(directory, cleanup=False):
-	items = glob(directory + "/*")
+	items = glob(f"{directory}/*")
 	changed = [os.path.relpath(path, directory) for path in items if storage.is_path_changed(path)]
 
-	if len(changed) < 1:
+	if not changed:
 		print_progress_bar(1, 1, suffix = 'Complete!', length = 50)
 		return 0
 
@@ -44,14 +43,14 @@ def push(directory, cleanup=False):
 
 	dst_root = dst_root.replace("\\", "/")
 	if not dst_root.startswith("/"):
-		dst_root = "/" + dst_root
+		dst_root = f"/{dst_root}"
 
 	src_root = directory.replace("\\", "/")
 
 	progress = 0
 	for filename in changed:
-		src = src_root + "/" + filename
-		dst = dst_root + "/" + filename
+		src = f"{src_root}/{filename}"
+		dst = f"{dst_root}/{filename}"
 		print_progress_bar(progress, len(changed), suffix = f'Pushing {filename}' + (" " * 20), length = 50)
 		subprocess.call([make_config.get_adb(), "shell", "rm", "-r", dst], stderr=ignore, stdout=ignore)
 		result = subprocess.call([make_config.get_adb(), "push", src, dst], stderr=ignore, stdout=ignore)
@@ -60,8 +59,10 @@ def push(directory, cleanup=False):
 		if result != 0:
 			print(f"failed to push to directory {dst_root} with code {result}")
 			return result
-	
-	print_progress_bar(progress, len(changed), suffix = f'Complete!' + (" " * 20), length = 50)
+
+	print_progress_bar(
+		progress, len(changed), suffix='Complete!' + " " * 20, length=50
+	)
 	storage.save()
 	return result
 

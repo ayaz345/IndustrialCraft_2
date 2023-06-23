@@ -99,7 +99,7 @@ def task_compile_native_debug():
 def task_compile_native_release():
 	abis = get_make_config().get_value("make.abis", [])
 	if abis is None or not isinstance(abis, list) or len(abis) == 0:
-		error(f"ERROR: no make.abis value in config")
+		error("ERROR: no make.abis value in config")
 	from native.native_build import compile_all_using_make_config
 	return compile_all_using_make_config(abis)
 
@@ -151,7 +151,7 @@ def task_build_additional():
 		if "source" in additional_dir and "targetDir" in additional_dir:
 			for additional_path in get_make_config().get_paths(additional_dir["source"]):
 				if not os.path.exists(additional_path):
-					print("non existing additional path: " + additional_path)
+					print(f"non existing additional path: {additional_path}")
 					overall_result = 1
 					break
 				target = get_make_config().get_path(os.path.join(
@@ -197,10 +197,10 @@ def task_build_package():
 	config = get_make_config()
 	output_dir = config.get_path("output")
 	mod_folder = config.get_value("make.modFolder")
-	output_file = config.get_path(mod_folder + ".icmod")
+	output_file = config.get_path(f"{mod_folder}.icmod")
 	output_root_tmp = config.get_path("toolchain/build")
-	output_dir_tmp = output_root_tmp + "/" + mod_folder
-	output_file_tmp = output_root_tmp + "/mod.zip"
+	output_dir_tmp = f"{output_root_tmp}/{mod_folder}"
+	output_file_tmp = f"{output_root_tmp}/mod.zip"
 	ensure_directory(output_dir)
 	ensure_file_dir(output_file_tmp)
 	if os.path.isfile(output_file):
@@ -253,8 +253,7 @@ def task_connect_to_adb():
 	port = None
 	pattern = re.compile(r"(\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}):(\d{4})")
 	for arg in sys.argv:
-		match = pattern.search(arg)
-		if match:
+		if match := pattern.search(arg):
 			ip = match[0]
 			port = match[1]
 
@@ -267,8 +266,7 @@ def task_connect_to_adb():
 	from subprocess import call
 	call([make_config.get_adb(), "disconnect"], stdout=devnull, stderr=devnull)
 	call([make_config.get_adb(), "tcpip", port], stdout=devnull, stderr=devnull)
-	result = call([make_config.get_adb(), "connect", ip])
-	return result
+	return call([make_config.get_adb(), "connect", ip])
 
 
 @task("cleanup")

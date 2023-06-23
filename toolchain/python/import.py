@@ -36,7 +36,7 @@ def import_build_config(make_file, source, destination):
 		make_file["global"]["api"] = config.get_value("defaultConfig.api", "CoreEngine")
 
 		src_dir = os.path.join(destination, "src")
-		
+
 		# clear assets folder
 		assets_dir = os.path.join(src_dir, "assets")
 		clear_directory(assets_dir)
@@ -65,10 +65,9 @@ def import_build_config(make_file, source, destination):
 			path_parts = path_stripped.split('/')
 			path = os.path.join(*path_parts)
 			copy_directory(os.path.join(source, path), os.path.join(assets_dir, path), True)
-			resources.append({
-				"path": "src/assets/" + path_stripped,
-				"type": res_dir["resourceType"]
-			})
+			resources.append(
+				{"path": f"src/assets/{path_stripped}", "type": res_dir["resourceType"]}
+			)
 
 			root_files.append(path_parts[0])
 
@@ -85,7 +84,7 @@ def import_build_config(make_file, source, destination):
 		if os.path.isdir(old_libs_dir):
 			root_files.append(old_libs_parts[0])
 			copy_directory(old_libs_dir, libs_dir)
-		
+
 
 		# some pre-defined source folders
 		sources = [
@@ -107,7 +106,7 @@ def import_build_config(make_file, source, destination):
 		for source_dir in config.get_filtered_list("compile", "sourceType", ("mod", "launcher")):
 			if source_dir["sourceType"] == "mod": 
 				source_dir["sourceType"] = "main"
-			
+
 			sourceObj = {
 				"type": source_dir["sourceType"],
 				"language": "javascript"
@@ -117,15 +116,15 @@ def import_build_config(make_file, source, destination):
 			root_files.append(source_parts[0])
 
 			build_dirs = config.get_filtered_list("buildDirs", "targetSource", (source_dir["path"]))
-			if(len(build_dirs) > 0):
+			if (len(build_dirs) > 0):
 				old_build_path = build_dirs[0]["dir"].strip("/")
 				old_path_parts = old_build_path.split('/')
-				sourceObj["source"] = "src/" + old_build_path
+				sourceObj["source"] = f"src/{old_build_path}"
 				sourceObj["target"] = source_dir["path"]
 				root_files.append(old_path_parts[0])
 
 				copy_directory(os.path.join(source, *old_path_parts), os.path.join(src_dir, *old_path_parts), True)
-				 
+
 			else:
 				sourceObj["source"] = "src/" + source_dir["path"]
 				copy_file(os.path.join(source, *source_parts), os.path.join(src_dir, *source_parts))
@@ -167,13 +166,12 @@ def init_java_and_native(make_file, directory):
 			if module_name != "":
 				os.rename(sample_native_module,
 					os.path.join(src_dir, "native", module_name))
-		else:
-			if(os.path.isdir(sample_native_module)):
-				clear_directory(sample_native_module)
+		elif (os.path.isdir(sample_native_module)):
+			clear_directory(sample_native_module)
 
 
 	sample_java_archive = os.path.join(src_dir, "java.zip")
-	if(not os.path.exists(sample_java_archive)):
+	if (not os.path.exists(sample_java_archive)):
 		print("java sample module is unavailable")
 	else: 
 		res = input("Do you want to initialize a new java directory? [y/N]: ")
@@ -193,14 +191,13 @@ def init_java_and_native(make_file, directory):
 			classpath = os.path.join(directory, ".classpath")
 			tree = etree.parse(classpath)
 			for classpathentry in tree.getroot():
-				if(classpathentry.attrib["kind"] == "src"):
-					classpathentry.attrib["path"] = "src/java/" + module_name + "/src"
+				if (classpathentry.attrib["kind"] == "src"):
+					classpathentry.attrib["path"] = f"src/java/{module_name}/src"
 
 			tree.write(classpath, encoding="utf-8", xml_declaration=True)
-			
-		else:
-			if(os.path.isfile(sample_java_archive)):
-				os.remove(sample_java_archive)
+
+		elif (os.path.isfile(sample_java_archive)):
+			os.remove(sample_java_archive)
 
 
 def cleanup_if_required(directory):
@@ -225,7 +222,9 @@ def init_adb(make_file, dirname):
 	if pack_name == "":
 		pack_name = "Inner_Core"
 
-	make_file["make"]["pushTo"] = "storage/emulated/0/games/horizon/packs/" + pack_name + "/innercore/mods/" + dirname
+	make_file["make"][
+		"pushTo"
+	] = f"storage/emulated/0/games/horizon/packs/{pack_name}/innercore/mods/{dirname}"
 
 
 print("running project import script")

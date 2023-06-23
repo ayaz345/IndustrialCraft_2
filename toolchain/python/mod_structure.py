@@ -57,9 +57,11 @@ class ModStructure:
 	def get_all_targets(self, target_type, prop=None, values=()):
 		targets = []
 		if target_type in self.targets:
-			for target in self.targets[target_type]:
-				if prop is None or prop in target and target[prop] in values:
-					targets.append(target)
+			targets.extend(
+				target
+				for target in self.targets[target_type]
+				if prop is None or prop in target and target[prop] in values
+			)
 		return targets
 
 	def get_target_directories(self, *names, filter_unchanged=False):

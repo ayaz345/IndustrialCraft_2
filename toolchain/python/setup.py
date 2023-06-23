@@ -43,13 +43,12 @@ def init_java_and_native(make_file, directory):
 			if module_name != "":
 				os.rename(sample_native_module,
 					join(src_dir, "native", module_name))
-		else:
-			if(isdir(sample_native_module)):
-				clear_directory(sample_native_module)
+		elif (isdir(sample_native_module)):
+			clear_directory(sample_native_module)
 
 
 	sample_java_archive = join(src_dir, "java.zip")
-	if(not exists(sample_java_archive)):
+	if (not exists(sample_java_archive)):
 		print("java sample module is unavailable")
 	else: 
 		res = input("Do you want to initialize a new java directory? [y/N]: ")
@@ -69,14 +68,13 @@ def init_java_and_native(make_file, directory):
 			classpath = join(directory, ".classpath")
 			tree = etree.parse(classpath)
 			for classpathentry in tree.getroot():
-				if(classpathentry.attrib["kind"] == "src"):
-					classpathentry.attrib["path"] = "src/java/" + module_name + "/src"
+				if (classpathentry.attrib["kind"] == "src"):
+					classpathentry.attrib["path"] = f"src/java/{module_name}/src"
 
 			tree.write(classpath, encoding="utf-8", xml_declaration=True)
-			
-		else:
-			if(isfile(sample_java_archive)):
-				os.remove(sample_java_archive)
+
+		elif (isfile(sample_java_archive)):
+			os.remove(sample_java_archive)
 
 
 def cleanup_if_required(directory):
@@ -117,7 +115,9 @@ def init_adb(make_file, dirname):
 	if pack_name == "":
 		pack_name = "Inner_Core"
 
-	make_file["make"]["pushTo"] = "storage/emulated/0/games/horizon/packs/" + pack_name + "/innercore/mods/" + dirname
+	make_file["make"][
+		"pushTo"
+	] = f"storage/emulated/0/games/horizon/packs/{pack_name}/innercore/mods/{dirname}"
 
 
 print("running project setup script")

@@ -11,12 +11,11 @@ def get_path_set(paths, error_sensitive=False):
 		for directory in make_config.get_paths(path):
 			if isdir(directory):
 				directories.append(directory)
+			elif error_sensitive:
+				print(f"declared invalid directory {path}, task will be terminated")
+				return None
 			else:
-				if error_sensitive:
-					print(f"declared invalid directory {path}, task will be terminated")
-					return None
-				else:
-					print(f"declared invalid directory {path}, it will be skipped")
+				print(f"declared invalid directory {path}, it will be skipped")
 	return directories
 
 
